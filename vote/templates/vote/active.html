@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Активные голосования</h1>
+    <a href="/completed/">Завершенные голосования</a>
+    {% for vote in votes_active %}
+        <h3><a href="/{{ vote.id }}">{{ vote.name }}</a></h3> <br>
+        {{ vote.date_start }} - {{ vote.date_end }} <br>
+        Максимальное количество голосов: {{ vote.max_count_vote }} <br>
+        Персонажи:
+        <ul>
+            {% for character in vote.character.all %}
+            <li>
+                <img src="{{ character.photo.url }}" width="200px" height="auto"><br>
+                {{ character.last_name }} {{ character.first_name }} {{ character.middle_name }}<br>
+                Возраст: {{ character.age }}<br>
+                Биография: {{ character.short_biography }}<br>
+                Голосов: {{ character.vote_count }}
+            </li>
+            {% endfor %}
+        </ul>
+        <hr>
+    {% endfor %}
+</body>
+</html>

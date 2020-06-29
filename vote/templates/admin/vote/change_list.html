@@ -1,0 +1,8 @@
+{% extends 'admin/change_list.html' %}
+{% block object-tools %}
+  <form action="/send/">
+    {% csrf_token %}
+    <input type="submit" value="Результаты голосования" />
+  </form>
+    {{ block.super }}
+{% endblock %}
