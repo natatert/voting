@@ -13,37 +13,32 @@ import io
 
 
 # Create your views here.
-def active(request):
-    votes_active = Vote.objects.filter(date_start__lt=datetime.date.today(), date_end__gte=datetime.date.today())
-    votes = []
-    for vote_active in votes_active:
-        if vote_active.max_count_vote:
-            if not vote_active.character.filter(vote_count__gte=vote_active.max_count_vote).exists():
-                votes.append(vote_active)
-        else:
-            votes.append(vote_active)
 
-    return render(request, 'vote/active.html', {'votes_active': votes})
+def get_active_votes():   # нахождение всех активных голосований
+    votes_date_filter = Vote.objects.filter(date_start__lt=datetime.date.today(), date_end__gte=datetime.date.today())
+    active_votes = []
+    for vote in votes_date_filter:
+        if vote.max_count_vote:
+            if not vote.character.filter(vote_count__gte=vote.max_count_vote).exists():
+                active_votes.append(vote)
+        else:
+            active_votes.append(vote)
+    return active_votes
+
+
+def active(request):
+    return render(request, 'vote/active.html', {'votes_active': get_active_votes()})
 
 
 def completed(request):
-    votes_completed = Vote.objects.all()
-    votes = []
-    for vote_completed in votes_completed:
-        if vote_completed.max_count_vote:
-            if vote_completed.character.filter(vote_count__gte=vote_completed.max_count_vote).exists():
-                votes.append(vote_completed)
-        elif vote_completed.date_end < datetime.date.today():
-            votes.append(vote_completed)
-
-    return render(request, 'vote/completed.html', {'votes_completed': votes})
+    votes_completed = set(Vote.objects.all()).difference(get_active_votes())
+    return render(request, 'vote/completed.html', {'votes_completed': votes_completed})
 
 
 def detail(request, vote_id):
     try:
         vote = Vote.objects.get(pk=vote_id)
-        compare_vote_count = vote.character.filter(vote_count__gte=vote.max_count_vote).exists()
-        voting_button = True if not compare_vote_count & (vote.date_end > datetime.date.today()) else False
+        voting_button = True if vote in get_active_votes() else False   # показать/скрыть кнопку для голосования
         time_left = (vote.date_end - datetime.date.today()).days if vote.date_end > datetime.date.today() else 0
     except Vote.DoesNotExist:
         raise Http404("Vote does not exist")
