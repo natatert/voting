@@ -1,15 +1,16 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect, redirect
 import datetime
-from django.http import Http404
-from django.urls import reverse
+import io
+import xlwt
+from io import BytesIO
+import matplotlib.pyplot as plt
 from apscheduler.schedulers.background import BackgroundScheduler
+from django.core.mail import EmailMessage
+from django.db.models import F
+from django.http import Http404
+from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect, redirect
+from django.urls import reverse
 from django.views.generic import View
 from .models import Vote
-from io import BytesIO
-import xlwt
-from django.core.mail import EmailMessage
-import matplotlib.pyplot as plt
-import io
 
 
 # Create your views here.
@@ -85,7 +86,7 @@ def vote(request, vote_id):
             'error_message': "You didn't select a character.",
         })
     else:
-        selected_character.vote_count += 1
+        selected_character.vote_count = F('vote_count') + 1
         selected_character.save()
         return HttpResponseRedirect(reverse('vote:detail', args=(vote.id,)))
 
