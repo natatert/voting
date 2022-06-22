@@ -8,7 +8,7 @@ django-apscheduler==0.3.0
 #filelock==3.0.12
 kiwisolver==1.2.0
 matplotlib==3.2.2
-numpy==1.19.0
+numpy==1.22.0
 Pillow==7.1.2
 pip==19.2.3
 psycopg2==2.8.5
